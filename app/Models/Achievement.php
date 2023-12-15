@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Achievement extends Model
 {
     use HasFactory;
-    
+
     protected $fillable = ['name', 'badge_id'];
 
     /**
@@ -19,5 +19,15 @@ class Achievement extends Model
     public function badge()
     {
         return $this->belongsTo(Badge::class);
+    }
+
+    /**
+     * get available badges.
+     *
+     * @return array
+    */
+    public static function availableAchievements()
+    {
+        return static::pluck('name')->toArray();
     }
 }

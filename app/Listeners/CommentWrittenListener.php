@@ -5,15 +5,18 @@ namespace App\Listeners;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Events\CommentWritten;
+use App\Services\AchievementService;
 
 class CommentWrittenListener
 {
+    protected AchievementService $achievementService;
+    
     /**
      * Create the event listener.
      */
-    public function __construct()
+    public function __construct(AchievementService $achievementService)
     {
-        //
+        $this->achievementService = $achievementService;
     }
 
     /**
@@ -21,6 +24,6 @@ class CommentWrittenListener
      */
     public function handle(CommentWritten $event): void
     {
-        //
+        $this->achievementService->unlockAchievement($event->comment->user, 'comments_written');
     }
 }

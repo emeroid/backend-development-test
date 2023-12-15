@@ -87,5 +87,15 @@ class User extends Authenticatable
         return $this->hasMany(Achievement::class);
     }
 
+    /**
+     * Define the relationship with badges.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    */
+    public function badges()
+    {
+        return $this->belongsToMany(Badge::class)->withTimestamps();
+    }
+
 }
 
