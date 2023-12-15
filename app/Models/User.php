@@ -66,5 +66,26 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Lesson::class)->wherePivot('watched', true);
     }
+
+    /**
+     * Define the relationship with the user's current badge.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function badge()
+    {
+        return $this->belongsTo(Badge::class);
+    }
+
+    /**
+     * Define the relationship with achievements.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function achievements()
+    {
+        return $this->hasMany(Achievement::class);
+    }
+
 }
 
