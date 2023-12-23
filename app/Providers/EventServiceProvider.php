@@ -7,7 +7,13 @@ use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Event;
 use App\Events\LessonWatched;
+use App\Events\AchievementUnlocked;
+use App\Events\BadgeUnlocked;
+use App\Events\CommentWritten;
 use App\Listeners\LessonWatchedListener;
+use App\Listeners\AchievementUnlockedListener;
+use App\Listeners\BadgeUnlockedListener;
+use App\Listeners\CommentWrittenListener;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -22,7 +28,16 @@ class EventServiceProvider extends ServiceProvider
         ],
         LessonWatched::class => [
             LessonWatchedListener::class
-        ]
+        ],
+        CommentWritten::class => [
+            CommentWrittenListener::class
+        ],
+        AchievementUnlocked::class => [
+            AchievementUnlockedListener::class,
+        ],
+        BadgeUnlocked::class => [
+            BadgeUnlockedListener::class,
+        ],
     ];
 
     /**

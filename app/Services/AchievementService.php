@@ -7,6 +7,7 @@ use App\Events\AchievementUnlocked;
 use App\Events\BadgeUnlocked;
 use App\Models\Badge;
 use App\Models\Achievement;
+use Illuminate\Support\Facades\Log;
 
 class AchievementService
 {
@@ -22,9 +23,17 @@ class AchievementService
         // Determine the achievement name based on the achievement type and count
         $count = $this->getAchievementCount($user, $achievementType);
         $achievementName = $this->getAchievementName($achievementType, $count);
+        
+        // Example debug code
+        //Log::debug('unlockAchievement called', ['user_id' => $user->id, 'achievementType' => $achievementType]);        
+
+        Log::debug('Check Achievement is true or false > ' . !$this->isAchievementUnlocked($user, $achievementName));
     
         // Check if the achievement is not unlocked
         if (!$this->isAchievementUnlocked($user, $achievementName)) {
+
+            Log::debug('unlockAchievement called in check condition', ['user_id' => $user->id, 'achievement Name' => $achievementName]); 
+
             // Create a new achievement for the user
             $user->achievements()->create(['name' => $achievementName]);
     
@@ -101,7 +110,7 @@ class AchievementService
         foreach ($availableBadges as $badgeName) {
             $badge = Badge::where('name', $badgeName)->first();
 
-            if ($badge && count($unlockedAchievements) >= $badge->points) {
+            if ($badge && count($unlockedAchievements) >= $badge->point) {
                 $nextBadge = $badgeName;
                 break;
             }

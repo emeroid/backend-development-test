@@ -10,6 +10,7 @@ use App\Events\LessonWatched;
 class LessonWatchedListener
 {
     protected AchievementService $achievementService;
+    
     /**
      * Create the event listener.
      */

@@ -6,6 +6,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use App\Events\CommentWritten;
 use App\Services\AchievementService;
+use Illuminate\Support\Facades\Log;
 
 class CommentWrittenListener
 {
@@ -21,7 +22,7 @@ class CommentWrittenListener
 
     /**
      * Handle the event.
-     */
+    */
     public function handle(CommentWritten $event): void
     {
         $this->achievementService->unlockAchievement($event->comment->user, 'comments_written');

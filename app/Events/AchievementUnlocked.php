@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Models\User;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -14,23 +15,16 @@ class AchievementUnlocked
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    /**
-     * Create a new event instance.
-     */
-    public function __construct()
-    {
-        //
-    }
+    public $achievementName;
+    public $user;
 
     /**
-     * Get the channels the event should broadcast on.
-     *
-     * @return array<int, \Illuminate\Broadcasting\Channel>
-     */
-    public function broadcastOn(): array
+     * Create a new event instance.
+    */
+    public function __construct(string $achievementName, User $user)
     {
-        return [
-            new PrivateChannel('channel-name'),
-        ];
+        $this->achievementName = $achievementName;
+        $this->user = $user;
     }
+
 }
