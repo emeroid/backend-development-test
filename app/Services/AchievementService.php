@@ -13,7 +13,7 @@ class AchievementService
 {
     
     /**
-     * Unlock achievements for watching lessons.
+     * Unlock achievements for watching lessons and comment written.
      * 
      * @param User $user
      * @param string $achievementType
@@ -23,16 +23,9 @@ class AchievementService
         // Determine the achievement name based on the achievement type and count
         $count = $this->getAchievementCount($user, $achievementType);
         $achievementName = $this->getAchievementName($achievementType, $count);
-        
-        // Example debug code
-        //Log::debug('unlockAchievement called', ['user_id' => $user->id, 'achievementType' => $achievementType]);        
 
-        Log::debug('Check Achievement is true or false > ' . !$this->isAchievementUnlocked($user, $achievementName));
-    
         // Check if the achievement is not unlocked
         if (!$this->isAchievementUnlocked($user, $achievementName)) {
-
-            Log::debug('unlockAchievement called in check condition', ['user_id' => $user->id, 'achievement Name' => $achievementName]); 
 
             // Create a new achievement for the user
             $user->achievements()->create(['name' => $achievementName]);
@@ -56,7 +49,7 @@ class AchievementService
     {
         switch ($achievementType) {
             case 'lessons_watched':
-                return $user->watched()->wherePivot('watched', true)->count();
+                return $user->watched()->count();
             case 'comments_written':
                 return $user->comments()->count();
             // Add more cases for other achievement types as needed
@@ -77,7 +70,6 @@ class AchievementService
     {
         // Define the achievement names and their corresponding thresholds
         $achievementNames = config("achievments");
-
         // Use the achievement name corresponding to the threshold
         return $achievementNames[$achievementType][$count] ?? '';
     }
@@ -99,33 +91,25 @@ class AchievementService
      * Check and unlock a badge for a user.
      *
      * @param User $user
-     */
+    */
     protected function checkAndUnlockBadge(User $user)
     {
         $unlockedAchievements = $this->getUnlockedAchievements($user);
-        
-        $nextBadge = null;
-        $availableBadges = Badge::availableBadges();
 
-        foreach ($availableBadges as $badgeName) {
-            $badge = Badge::where('name', $badgeName)->first();
+        $availableBadges = Badge::query()
+            ->where('point', '<=', count($unlockedAchievements))
+            ->orderBy('point')
+            ->get();
+        dd(['Bbadges' => $availableBadges->pluck("name")->toArray()]);
 
-            if ($badge && count($unlockedAchievements) >= $badge->point) {
-                $nextBadge = $badgeName;
-                break;
+        foreach ($availableBadges as $badge) {
+            if (!$user->badges->contains($badge)) {
+                $user->badges()->attach($badge->id);
+                event(new BadgeUnlocked($badge->name, $user));
             }
         }
-
-        // Check if a new badge is unlocked
-        if ($nextBadge !== null) {
-            // Attach the badge to the user
-            $user->badges()->attach($badge->id);
-
-            // Fire BadgeUnlocked event
-            event(new BadgeUnlocked($nextBadge, $user));
-        }
     }
-
+    
     /**
      * get unlock achievment for a user.
      *
@@ -142,12 +126,25 @@ class AchievementService
      * @param User $user
      * @return string
      */
-    public function getCurrentBadge(User $user): string
+    public function getCurrentBadge(User $user)
     {
         // Get the user's current badge from the database
-        $currentBadge = $user->badges;
+        $currentBadge = $user->badges()->pluck('name')->toArray();
 
-        return $currentBadge ? $currentBadge->name : null;
+        return $currentBadge ? end($currentBadge) : null;
+    }
+
+    /**
+     * Get the current badge for a user.
+     *
+     * @param User $user
+     * @return string
+     */
+    public function getCurrentBadgePoint(User $user)
+    {
+        // Get the user's current badge from the database
+        $currentBadge = $user->badges()->pluck('point')->toArray();
+        return end($currentBadge);
     }
 
     public function getNextBadge($user)

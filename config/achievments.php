@@ -15,11 +15,11 @@
 
         // the array key represent the thresholds
         'lessons_watched' => [
-            1 => 'First Lesson Watched',
-            5 => '5 Lessons Watched',
-            10 => '10 Lessons Watched',
-            25 => '25 Lessons Watched',
-            50 => '50 Lessons Watched',
+            0 => 'First Lesson Watched',
+            1 => '5 Lessons Watched',
+            2 => '10 Lessons Watched',
+            3 => '25 Lessons Watched',
+            4 => '50 Lessons Watched',
             // you can add more unique threshold and new values
         ],
     ];
