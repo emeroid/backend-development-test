@@ -29,12 +29,13 @@ class AchievementService
 
             // Create a new achievement for the user
             $user->achievements()->create(['name' => $achievementName]);
+            $user->refresh();
     
             // Fire AchievementUnlocked event
             event(new AchievementUnlocked($achievementName, $user));
     
             // Check if a new badge is unlocked
-            $this->checkAndUnlockBadge($user);
+            $this->checkAndUnlockBadge($user, $achievementType);
         }
     }
 
@@ -92,15 +93,15 @@ class AchievementService
      *
      * @param User $user
     */
-    protected function checkAndUnlockBadge(User $user)
+    protected function checkAndUnlockBadge(User $user, $achievementType)
     {
-        $unlockedAchievements = $this->getUnlockedAchievements($user);
+        //$unlockedAchievements = $this->getUnlockedAchievements($user);
+        $countAchievements = $this->getAchievementCount($user, $achievementType);
 
         $availableBadges = Badge::query()
-            ->where('point', '<=', count($unlockedAchievements))
+            ->where('point', '<=', $countAchievements)
             ->orderBy('point')
             ->get();
-        dd(['Bbadges' => $availableBadges->pluck("name")->toArray()]);
 
         foreach ($availableBadges as $badge) {
             if (!$user->badges->contains($badge)) {
@@ -193,7 +194,7 @@ class AchievementService
         $unlockedAchievementsCount = count($this->getUnlockedAchievements($user));
         $currentBadge = $this->getCurrentBadge($user);
 
-        return max(0, $achievementsNeededForNextBadge[$currentBadge] - $unlockedAchievementsCount);
+        return isset($achievementsNeededForNextBadge[$currentBadge]) ? max(0, $achievementsNeededForNextBadge[$currentBadge] - $unlockedAchievementsCount): 0;
     }
 
 }

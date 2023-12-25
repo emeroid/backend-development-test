@@ -14,12 +14,20 @@ class AchievementsController extends Controller
     
     public function index(User $user)
     {
-        return response()->json([
-            'unlocked_achievements' => $this->achievementService->getUnlockedAchievements($user),
-            'next_available_achievements' => $this->achievementService->getNextAvailableAchievements($user),
-            'current_badge' => $this->achievementService->getCurrentBadge($user),
-            'next_badge' => $this->achievementService->getNextBadge($user),
-            'remaing_to_unlock_next_badge' =>  $this->achievementService->getRemainingToUnlockNextBadge($user)
-        ]);
+        try{
+            return response()->json([
+                'unlocked_achievements' => $this->achievementService->getUnlockedAchievements($user),
+                'next_available_achievements' => $this->achievementService->getNextAvailableAchievements($user),
+                'current_badge' => $this->achievementService->getCurrentBadge($user),
+                'next_badge' => $this->achievementService->getNextBadge($user),
+                'remaing_to_unlock_next_badge' =>  $this->achievementService->getRemainingToUnlockNextBadge($user)
+            ]);
+
+        } catch(\Exception $e) {
+            return response()->json([
+                'status' => "error",
+                "message" => $e->getMessage()
+            ]);
+        }
     }
 }

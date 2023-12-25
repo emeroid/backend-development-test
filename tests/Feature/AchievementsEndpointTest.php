@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Models\Achievement; // Import Achievement model
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
+use App\Services\AchievementService;
 
 class AchievementsEndpointTest extends TestCase
 {
@@ -16,11 +17,11 @@ class AchievementsEndpointTest extends TestCase
 
         //create badges
         
-
         // Add achievements to the user
         Achievement::factory()->create(['user_id' => $user->id, 'name' => 'First Lesson Watched']);
         Achievement::factory()->create(['user_id' => $user->id, 'name' => '3 Comments Written']);
 
+        $achievements = new AchievementService;
         // Act: Request the achievements endpoint
         $response = $this->get("/users/{$user->id}/achievements");
 
@@ -31,7 +32,13 @@ class AchievementsEndpointTest extends TestCase
                 'next_available_achievements',
                 'current_badge',
                 'next_badge',
-                'remaining_to_unlock_next_badge',
+                'remaing_to_unlock_next_badge',
+            ])->assertJson([
+                'unlocked_achievements' => $achievements->getUnlockedAchievements($user),
+                'next_available_achievements' => $achievements->getNextAvailableAchievements($user),
+                'current_badge' => $achievements->getCurrentBadge($user),
+                'next_badge' => $achievements->getNextBadge($user),
+                'remaing_to_unlock_next_badge' => $achievements->getRemainingToUnlockNextBadge($user),
             ]);
     }
 }
